@@ -1,0 +1,19 @@
+{
+  "name": "google-scholar-mcp",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["mcp", "google-scholar", "serpapi"],
+  "author": "",
+  "license": "ISC",
+  "description": "MCP server for Google Scholar search using SerpAPI",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.16.0",
+    "dotenv": "^17.2.0",
+    "google-search-results-nodejs": "^2.1.0"
+  }
+}

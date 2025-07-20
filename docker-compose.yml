@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  google-scholar-mcp:
+    build: .
+    image: google-scholar-mcp:latest
+    environment:
+      - SERPAPI_API_KEY=${SERPAPI_API_KEY}
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
