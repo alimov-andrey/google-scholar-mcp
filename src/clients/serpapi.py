@@ -91,7 +91,7 @@ class SerpAPIClient:
         """
         params = {
             "engine": "google_scholar_profiles",
-            "q": author_name,
+            "mauthors": author_name,
         }
         return await self._request(params)
 

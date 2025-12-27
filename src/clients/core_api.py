@@ -22,7 +22,7 @@ class CoreAPIClient:
             timeout: Request timeout in seconds
         """
         self.api_key = api_key
-        self._client = httpx.AsyncClient(timeout=timeout)
+        self._client = httpx.AsyncClient(timeout=timeout, follow_redirects=True)
 
     async def close(self):
         """Close the HTTP client."""
