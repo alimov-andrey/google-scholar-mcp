@@ -1,5 +1,7 @@
 """Google Scholar MCP Server - Entry Point."""
 
+from contextlib import asynccontextmanager
+
 from fastmcp import FastMCP
 
 from .config import get_settings
@@ -8,59 +10,57 @@ from .clients.core_api import CoreAPIClient
 from .tools.scholar import register_scholar_tools
 from .tools.fulltext import register_fulltext_tools
 
-# Initialize FastMCP server
-mcp = FastMCP(
-    name="google-scholar-mcp",
-    version="2.0.0",
-)
-
-# Initialize clients on startup
-settings = None
-serpapi_client = None
-core_client = None
+# Global client references (set during lifespan)
+_serpapi_client: SerpAPIClient | None = None
+_core_client: CoreAPIClient | None = None
 
 
-@mcp.on_startup
-async def startup():
-    """Initialize clients on server startup."""
-    global settings, serpapi_client, core_client
+@asynccontextmanager
+async def lifespan(server: FastMCP):
+    """Server lifespan - initialize and cleanup clients."""
+    global _serpapi_client, _core_client
 
+    # Startup
     settings = get_settings()
 
     # SerpAPI client (required)
-    serpapi_client = SerpAPIClient(api_key=settings.serpapi_api_key)
+    _serpapi_client = SerpAPIClient(api_key=settings.serpapi_api_key)
 
     # CORE API client (optional, for full-text access)
     if settings.core_api_key:
-        core_client = CoreAPIClient(api_key=settings.core_api_key)
+        _core_client = CoreAPIClient(api_key=settings.core_api_key)
     else:
-        core_client = CoreAPIClient()
+        _core_client = CoreAPIClient()
 
+    yield
 
-@mcp.on_shutdown
-async def shutdown():
-    """Cleanup on server shutdown."""
-    global serpapi_client, core_client
-
-    if serpapi_client:
-        await serpapi_client.close()
-    if core_client:
-        await core_client.close()
+    # Shutdown
+    if _serpapi_client:
+        await _serpapi_client.close()
+    if _core_client:
+        await _core_client.close()
 
 
 def get_serpapi_client() -> SerpAPIClient:
     """Get SerpAPI client instance."""
-    if serpapi_client is None:
+    if _serpapi_client is None:
         raise RuntimeError("Server not initialized. SerpAPI client unavailable.")
-    return serpapi_client
+    return _serpapi_client
 
 
 def get_core_client() -> CoreAPIClient:
     """Get CORE API client instance."""
-    if core_client is None:
+    if _core_client is None:
         raise RuntimeError("Server not initialized. CORE API client unavailable.")
-    return core_client
+    return _core_client
 
+
+# Initialize FastMCP server with lifespan
+mcp = FastMCP(
+    name="google-scholar-mcp",
+    version="2.0.0",
+    lifespan=lifespan,
+)
 
 # Register all tools
 register_scholar_tools(mcp, get_serpapi_client)
