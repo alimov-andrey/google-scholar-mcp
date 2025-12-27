@@ -36,28 +36,6 @@ class SearchArticlesResult(BaseModel):
     articles: list[Article]
 
 
-# --- Author Models ---
-
-
-class Author(BaseModel):
-    """Author profile from Google Scholar."""
-
-    name: str
-    affiliations: Optional[str] = None
-    email: Optional[str] = None
-    interests: str = ""
-    author_id: Optional[str] = None
-    citations: int = 0
-
-
-class SearchAuthorResult(BaseModel):
-    """Result of author search."""
-
-    query: str
-    total_profiles: int
-    profiles: list[Author]
-
-
 # --- Citation Models ---
 
 

@@ -8,12 +8,10 @@ from pydantic import Field
 from ..clients.serpapi import SerpAPIClient
 from ..models.scholar import (
     Article,
-    Author,
     ArticleVersion,
     CitingArticle,
     CitationsResult,
     SearchArticlesResult,
-    SearchAuthorResult,
     VersionsResult,
 )
 
@@ -88,41 +86,6 @@ def register_scholar_tools(
             query=query,
             total_results=len(articles),
             articles=articles,
-        )
-
-    @mcp.tool()
-    async def search_author(
-        author_name: str = Field(..., description="Name of the author to search"),
-    ) -> SearchAuthorResult:
-        """Search for author profiles on Google Scholar.
-
-        Returns author profiles with name, affiliations, interests, and citation count.
-        """
-        client = get_client()
-
-        result = await client.search_profiles(author_name)
-
-        profiles = []
-        for profile in result.get("profiles", []):
-            # Extract interests
-            interests_list = profile.get("interests", [])
-            interests = ", ".join(i.get("title", "") for i in interests_list) if interests_list else ""
-
-            profiles.append(
-                Author(
-                    name=profile.get("name", ""),
-                    affiliations=profile.get("affiliations"),
-                    email=profile.get("email"),
-                    interests=interests,
-                    author_id=profile.get("author_id"),
-                    citations=profile.get("cited_by", {}).get("all", 0),
-                )
-            )
-
-        return SearchAuthorResult(
-            query=author_name,
-            total_profiles=len(profiles),
-            profiles=profiles,
         )
 
     @mcp.tool()

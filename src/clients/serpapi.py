@@ -80,21 +80,6 @@ class SerpAPIClient:
 
         return await self._request(params)
 
-    async def search_profiles(self, author_name: str) -> dict[str, Any]:
-        """Search Google Scholar for author profiles.
-
-        Args:
-            author_name: Name of the author
-
-        Returns:
-            Search results with profiles
-        """
-        params = {
-            "engine": "google_scholar_profiles",
-            "mauthors": author_name,
-        }
-        return await self._request(params)
-
     async def get_citations(
         self,
         citation_id: str,
