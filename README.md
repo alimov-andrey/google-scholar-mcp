@@ -5,10 +5,10 @@ MCP server for academic research via Claude Code. Search Google Scholar and acce
 ## Features
 
 - **Google Scholar Search** via SerpAPI
-  - Search academic articles
-  - Find author profiles
-  - Get citing articles
-  - Get article versions
+  - Search academic articles by query, year, language
+  - Find author profiles with citation counts
+  - Get articles citing a specific paper
+  - Get all versions of an article from different sources
 - **Full-text Access** via CORE API
   - Retrieve full text of Open Access articles
   - Search specifically for articles with full-text available
@@ -26,65 +26,123 @@ MCP server for academic research via Claude Code. Search Google Scholar and acce
 
 ## Quick Start
 
-### 1. Configure Environment
+### 1. Get API Keys
+
+**SerpAPI (Required)**
+- Sign up at [serpapi.com](https://serpapi.com/)
+- Free tier: 100 searches/month
+- Paid plans from $75/month for 5,000 searches
+
+**CORE API (Optional, for full-text)**
+- Register at [core.ac.uk/api-keys/register](https://core.ac.uk/api-keys/register)
+- Free: 100,000 requests/day
+
+### 2. Configure Environment
 
 ```bash
 cp .env.example .env
-# Add your SERPAPI_API_KEY
+# Edit .env and add your API keys:
+# SERPAPI_API_KEY=your_key_here
+# CORE_API_KEY=your_key_here  # optional
 ```
 
-### 2. Build Docker Image
+### 3. Build Docker Image
 
 ```bash
-docker-compose build
+docker compose build
 ```
 
-### 3. Configure Claude Code
+### 4. Configure Claude Code
 
-Add to `~/.claude.json`:
+**Option A: Global config** (`~/.claude.json`)
 
 ```json
 {
   "mcpServers": {
     "google-scholar": {
       "command": "docker",
-      "args": ["run", "--rm", "-i", "--env-file", "/Users/alimov/mcp-servers/google-schoolar-mcp/.env", "google-scholar-mcp:latest"]
+      "args": ["run", "--rm", "-i", "--env-file", "/path/to/your/.env", "google-scholar-mcp:latest"]
     }
   }
 }
 ```
 
-## API Keys
+**Option B: Project config** (`.mcp.json` in project root)
 
-### SerpAPI (Required)
-- Sign up at [serpapi.com](https://serpapi.com/)
-- Free tier: 100 searches/month
-- Paid plans from $75/month for 5,000 searches
+```json
+{
+  "mcpServers": {
+    "google-scholar": {
+      "command": "docker",
+      "args": ["run", "--rm", "-i", "--env-file", "/path/to/your/.env", "google-scholar-mcp:latest"]
+    }
+  }
+}
+```
 
-### CORE API (Optional)
-- Register at [core.ac.uk/api-keys/register](https://core.ac.uk/api-keys/register)
-- Free: 100,000 requests/day
-- Provides access to Open Access research papers
+## Usage Examples
+
+### Search Articles
+```
+Search for "transformer neural networks" articles from 2023
+```
+
+### Find Author
+```
+Find author profile for "Geoffrey Hinton"
+```
+
+### Get Citations
+```
+Get articles citing this paper (use citation_id from search results)
+```
+
+### Get Full Text
+```
+Get full text for article with DOI 10.1234/example
+```
 
 ## Project Structure
 
 ```
 google-scholar-mcp/
 ├── src/
-│   ├── main.py              # FastMCP server
-│   ├── config.py            # Settings
+│   ├── main.py              # FastMCP server entry point
+│   ├── config.py            # Pydantic settings
 │   ├── clients/
-│   │   ├── serpapi.py       # SerpAPI client
-│   │   └── core_api.py      # CORE API client
+│   │   ├── serpapi.py       # SerpAPI async client
+│   │   └── core_api.py      # CORE API async client
 │   ├── models/
-│   │   └── scholar.py       # Pydantic models
+│   │   └── scholar.py       # Pydantic response models
 │   └── tools/
 │       ├── scholar.py       # Google Scholar tools
 │       └── fulltext.py      # Full-text access tools
 ├── pyproject.toml
 ├── Dockerfile
-└── docker-compose.yml
+├── docker-compose.yml
+└── .github/workflows/
+    └── test.yml             # CI/CD pipeline
 ```
+
+## Development
+
+```bash
+# Install dependencies
+uv pip install -e ".[dev]"
+
+# Run tests
+pytest tests/ -v
+
+# Check syntax
+python -m py_compile src/main.py
+```
+
+## Tech Stack
+
+- **Python 3.12** + **fastmcp 2.14.1**
+- **httpx** for async HTTP
+- **Pydantic** for data validation
+- **Docker** for containerization
 
 ## License
 
