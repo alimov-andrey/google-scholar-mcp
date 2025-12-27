@@ -6,7 +6,6 @@ MCP server for academic research via Claude Code. Search Google Scholar and acce
 
 - **Google Scholar Search** via SerpAPI
   - Search academic articles by query, year, language
-  - Find author profiles with citation counts
   - Get articles citing a specific paper
   - Get all versions of an article from different sources
 - **Full-text Access** via CORE API
@@ -18,7 +17,6 @@ MCP server for academic research via Claude Code. Search Google Scholar and acce
 | Tool | Description |
 |------|-------------|
 | `search_articles` | Search for academic articles on Google Scholar |
-| `search_author` | Search for author profiles |
 | `get_citations` | Get articles citing a specific paper |
 | `get_article_versions` | Get all versions of an article |
 | `get_fulltext` | Get full text of Open Access article |
@@ -85,11 +83,6 @@ docker compose build
 ### Search Articles
 ```
 Search for "transformer neural networks" articles from 2023
-```
-
-### Find Author
-```
-Find author profile for "Geoffrey Hinton"
 ```
 
 ### Get Citations
