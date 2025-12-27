@@ -1,30 +1,27 @@
-FROM node:20-alpine
+FROM python:3.12-slim
 
 # Set working directory
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Install uv for fast dependency resolution
+RUN pip install --no-cache-dir uv
+
+# Copy project files
+COPY pyproject.toml README.md ./
+COPY src/ ./src/
 
 # Install dependencies
-# Use additional flags to suppress all npm output
-RUN npm ci --only=production --silent --no-progress --no-audit --no-fund 2>/dev/null || npm ci --only=production
-
-# Copy application files
-COPY index.js ./
+RUN uv pip install --system --no-cache .
 
 # Create non-root user
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001
+RUN addgroup --gid 1001 --system appuser && \
+    adduser --system --uid 1001 --gid 1001 appuser
 
 # Change ownership
-RUN chown -R nodejs:nodejs /app
+RUN chown -R appuser:appuser /app
 
 # Switch to non-root user
-USER nodejs
-
-# Disable dotenv output
-ENV DOTENV_CONFIG_SILENT=true
+USER appuser
 
 # MCP servers communicate via stdio
-ENTRYPOINT ["node", "index.js"]
+ENTRYPOINT ["python", "-m", "src.main"]

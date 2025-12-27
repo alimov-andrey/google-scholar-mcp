@@ -1,97 +1,91 @@
 # Google Scholar MCP Server
 
-Private MCP server for searching Google Scholar using SerpAPI.
+MCP server for academic research via Claude Code. Search Google Scholar and access Open Access full-text articles.
 
 ## Features
 
-- Search academic articles
-- Search author profiles  
-- Get citation information
-- Get article versions
+- **Google Scholar Search** via SerpAPI
+  - Search academic articles
+  - Find author profiles
+  - Get citing articles
+  - Get article versions
+- **Full-text Access** via CORE API
+  - Retrieve full text of Open Access articles
+  - Search specifically for articles with full-text available
 
-## Prerequisites
+## Tools
 
-- Docker Desktop 4.42+
-- SerpAPI key (get at https://serpapi.com/)
-- Claude Desktop
+| Tool | Description |
+|------|-------------|
+| `search_articles` | Search for academic articles on Google Scholar |
+| `search_author` | Search for author profiles |
+| `get_citations` | Get articles citing a specific paper |
+| `get_article_versions` | Get all versions of an article |
+| `get_fulltext` | Get full text of Open Access article |
+| `search_open_access` | Search for articles with full-text |
 
-## Setup
+## Quick Start
 
-1. Clone repository
-2. Create `.env` file with your SerpAPI key:
-   ```
-   SERPAPI_API_KEY=your_key_here
-   ```
+### 1. Configure Environment
 
-3. Build Docker image:
-   ```bash
-   docker-compose build
-   ```
+```bash
+cp .env.example .env
+# Add your SERPAPI_API_KEY
+```
 
-## Configure Claude Desktop
+### 2. Build Docker Image
 
-Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
+```bash
+docker-compose build
+```
+
+### 3. Configure Claude Code
+
+Add to `~/.claude.json`:
 
 ```json
 {
   "mcpServers": {
     "google-scholar": {
       "command": "docker",
-      "args": [
-        "run",
-        "--rm",
-        "-i",
-        "--env-file",
-        "/Users/alimov/mcp-servers/google-schoolar-mcp/.env",
-        "google-scholar-mcp:latest"
-      ]
+      "args": ["run", "--rm", "-i", "--env-file", "/Users/alimov/mcp-servers/google-schoolar-mcp/.env", "google-scholar-mcp:latest"]
     }
   }
 }
 ```
 
-## Available Tools
+## API Keys
 
-### search_articles
-Search for academic articles on Google Scholar.
+### SerpAPI (Required)
+- Sign up at [serpapi.com](https://serpapi.com/)
+- Free tier: 100 searches/month
+- Paid plans from $75/month for 5,000 searches
 
-Parameters:
-- `query` (required): Search query
-- `year_from`: Filter from year
-- `year_to`: Filter to year  
-- `language`: Language code (default: "en")
-- `num_results`: Number of results (max 20, default: 10)
+### CORE API (Optional)
+- Register at [core.ac.uk/api-keys/register](https://core.ac.uk/api-keys/register)
+- Free: 100,000 requests/day
+- Provides access to Open Access research papers
 
-### search_author
-Search for author profiles.
+## Project Structure
 
-Parameters:
-- `author_name` (required): Author name to search
-
-### get_citations
-Get articles citing a specific paper.
-
-Parameters:
-- `citation_id` (required): Citation ID from search results
-- `num_results`: Number of results (default: 10)
-
-### get_article_versions
-Get all versions of an article.
-
-Parameters:
-- `cluster_id` (required): Cluster ID from search results
-
-## Usage Example
-
-In Claude Desktop:
 ```
-Search for recent machine learning papers from 2023
+google-scholar-mcp/
+├── src/
+│   ├── main.py              # FastMCP server
+│   ├── config.py            # Settings
+│   ├── clients/
+│   │   ├── serpapi.py       # SerpAPI client
+│   │   └── core_api.py      # CORE API client
+│   ├── models/
+│   │   └── scholar.py       # Pydantic models
+│   └── tools/
+│       ├── scholar.py       # Google Scholar tools
+│       └── fulltext.py      # Full-text access tools
+├── pyproject.toml
+├── Dockerfile
+└── docker-compose.yml
 ```
 
-Claude will use the `search_articles` tool with appropriate parameters.
+## License
 
-## Security
-
-- API key stored in `.env` file (not in repository)
-- Docker container runs as non-root user
-- Isolated environment with minimal permissions
+MIT

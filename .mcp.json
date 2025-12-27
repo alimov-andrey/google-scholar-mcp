@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "google-scholar": {
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-i",
+        "--env-file",
+        "/Users/alimov/mcp-servers/google-schoolar-mcp/.env",
+        "google-scholar-mcp:latest"
+      ]
+    }
+  }
+}
